@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Routes } from '@angular/router';
 
+import { PlayerRoutingModule } from './player-routing.module';
 
 
 @NgModule({
   declarations: [],
   imports: [
-    CommonModule
+    CommonModule,
+    PlayerRoutingModule
   ]
 })
-export class AppRoutingModule { }
+export class PlayerModule { }

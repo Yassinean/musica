@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Routes } from '@angular/router';
 
+import { TrackRoutingModule } from './track-routing.module';
 
 
 @NgModule({
   declarations: [],
   imports: [
-    CommonModule
+    CommonModule,
+    TrackRoutingModule
   ]
 })
-export class AppRoutingModule { }
+export class TrackModule { }
