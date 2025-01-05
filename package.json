@@ -20,6 +20,7 @@
     "@angular/router": "^17.3.0",
     "@datorama/akita-ng-entity-service": "^8.0.0",
     "@ngrx/store": "^17.2.0",
+    "idb": "^8.0.1",
     "music-stream": "file:",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
