@@ -1,0 +1,9 @@
+<ul class="divide-y divide-white/10">
+  @for (category of Object.values(musicCategory); track category) {
+    <li class="p-4 hover:bg-white/5 transition-colors duration-200">
+      <a routerLink="" class="flex items-center space-x-3 text-sm">
+        <span class="capitalize">{{ category.toLowerCase() }}</span>
+      </a>
+    </li>
+  }
+</ul>

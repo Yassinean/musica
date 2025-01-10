@@ -1,0 +1,24 @@
+<nav class="bg-purple-800 text-white p-4 shadow-lg">
+  <div class="container mx-auto flex justify-between items-center">
+    <a href="/" class="text-2xl font-bold flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+      </svg>
+      MusicA
+    </a>
+    <ul class="flex space-x-4">
+      @for (link of navLinks; track link.path) {
+        <li>
+          <a
+            [routerLink]="link.path"
+            routerLinkActive="bg-purple-600"
+            [routerLinkActiveOptions]="{exact: true}"
+            class="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition duration-300"
+          >
+            {{ link.label }}
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+</nav>

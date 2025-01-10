@@ -1,0 +1,57 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
+    <div class="absolute top-1/2 right-0 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float animation-delay-2000"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float animation-delay-4000"></div>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto">
+    <!-- Library Title -->
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-center mb-8">
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+            Your Music Library
+          </span>
+    </h1>
+
+    <!-- Search Bar -->
+    <div class="max-w-md mx-auto mb-12">
+      <div class="relative">
+<!--        [(ngModel)]="searchQuery"-->
+<!--        (input)="onSearch()"-->
+        <input
+          type="text"
+          placeholder="Search your library..."
+          class="w-full py-3 px-4 bg-white/10 backdrop-blur-md rounded-full text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all duration-300"
+        >
+        <button
+          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-colors duration-200"
+        >
+<!--        (click)="onSearch()"-->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid gap-8 md:grid-cols-2">
+      <!-- Library Categories Section -->
+      <section class="bg-white/5 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
+        <h2 class="text-xl font-semibold text-center py-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-white/10">
+          Library Categories
+        </h2>
+        <app-library-categories></app-library-categories>
+      </section>
+
+      <!-- Library List Section -->
+      <section class="bg-white/5 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
+        <h2 class="text-xl font-semibold text-center py-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-white/10">
+          Your Tracks
+        </h2>
+        <!-- Pass filteredTracks instead of searchQuery -->
+        <app-library-list></app-library-list>
+      </section>
+    </div>
+  </div>
+</div>

@@ -1,20 +1,22 @@
 export interface Track {
   id: string;
-  name: string;
+  title: string;
   artist: string;
   description?: string;
-  dateAdded: string;
-  duration: number; // in seconds
-  category: CategoryMusic;
-  coverImage?: Blob; // Optional cover image
+  addedAt: Date;
+  duration: number;
+  category: MusicCategory;
+  fileUrl: string;
+  imageUrl?: string;
+  imageFileId: string;
 }
 
-export enum CategoryMusic {
-  POP = 'pop',
-  ROCK = 'rock',
-  RAP = 'rap',
-  CHAABI = 'cha3bi',
-  OTHER = 'other',
+export enum MusicCategory{
+  CHAABI = '🎵 cha3bi',
+  POP = '🎤 pop',
+  ROCK = '💿 rock',
+  RAP = '🎸 rap',
+  OTHER = '🎼 other'
 }
 
 export enum PlayerState {
@@ -24,5 +26,5 @@ export enum PlayerState {
   STOPPED = 'stopped',
   LOADING = 'loading',
   ERROR = 'error',
-  SUCCESS = 'success',
+  SUCCESS = 'success'
 }
