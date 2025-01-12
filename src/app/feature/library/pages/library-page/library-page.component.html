@@ -5,7 +5,7 @@
       <input
         type="text"
         [(ngModel)]="searchQuery"
-        placeholder="Search your library..."
+        placeholder="Search your track..."
         class="w-full py-3 px-4 bg-white/10 backdrop-blur-md rounded-full text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all duration-300"
       >
     </div>
@@ -25,7 +25,7 @@
       <h2 class="text-xl font-semibold text-center py-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-white/10">
         Your Tracks
       </h2>
-      <app-library-list 
+      <app-library-list
         [tracks]="tracks$ | async"
         [searchTerm]="searchQuery"
       ></app-library-list>

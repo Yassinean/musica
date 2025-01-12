@@ -64,13 +64,18 @@ export class LibraryListComponent implements OnInit, OnDestroy {
             next: (url) => {
               if (typeof url === "string") {
                 this.imageUrls[track.id!] = url;
+              } else {
+                this.imageUrls[track.id!] = this.defaultCoverImage;
               }
               console.log('Image URL fetched for track:', track.title, url);
             },
             error: (err) => {
               console.error('Error fetching image file URL:', err);
+              this.imageUrls[track.id!] = this.defaultCoverImage;
             },
           });
+        } else {
+          this.imageUrls[track.id!] = this.defaultCoverImage;
         }
       });
     });
@@ -110,21 +115,22 @@ export class LibraryListComponent implements OnInit, OnDestroy {
   }
 
   getTrackImage(track: Track): string {
-    if (!track.imageUrl) {
-      console.log(`No imageUrl for track ${track.id}`);
+    const imageUrl = this.imageUrls[track.id];
+    if (!imageUrl) {
+      console.log(`No imageUrl for track ${track.id}, using default`);
       return this.defaultCoverImage;
     }
 
-    if (this.isBlobUrl(track.imageUrl)) {
-      console.log(`Using blob URL for track ${track.id}:`, track.imageUrl);
-      return track.imageUrl;
+    if (this.isBlobUrl(imageUrl)) {
+      console.log(`Using blob URL for track ${track.id}:`, imageUrl);
+      return imageUrl;
     }
     const hasError = this.imageLoadError.value[track.id];
     if (hasError) {
       console.log(`Using default image for track ${track.id} due to previous error`);
       return this.defaultCoverImage;
     }
-    return track.imageUrl;
+    return imageUrl;
   }
 
   private isBlobUrl(url: string | undefined): boolean {
