@@ -1,8 +1,19 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 text-white py-16 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-2xl mx-auto">
-    <h1 class="text-3xl font-bold text-center mb-8">Update Track</h1>
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
+    <div class="absolute top-1/2 right-0 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float animation-delay-2000"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float animation-delay-4000"></div>
+  </div>
 
-    <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" class="space-y-6 bg-white/5 backdrop-blur-lg p-8 rounded-2xl">
+  <div class="max-w-3xl mx-auto relative">
+    <h1 class="text-4xl font-bold text-center mb-8">
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+        Update Track
+      </span>
+    </h1>
+
+    <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" class="space-y-6 bg-white/10 backdrop-blur-lg rounded-xl p-8 shadow-xl">
       <!-- Image Preview Section -->
       <div class="flex justify-center mb-6">
         <div class="relative w-48 h-48 rounded-lg overflow-hidden">
@@ -20,81 +31,93 @@
         <p class="text-red-400 text-sm">{{ error }}</p>
       </div>
 
-      <!-- File Input -->
-      <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-300">Track File</label>
-        <input
-          type="file"
-          (change)="onFileChange($event)"
-          accept="audio/*"
-          class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-        >
-        <div *ngIf="audioFileError" class="text-red-400 text-sm mt-1">
-          {{ audioFileError }}
-        </div>
-      </div>
-
-      <!-- Image Input -->
-      <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-300">Cover Image</label>
-        <input
-          type="file"
-          (change)="onImageChange($event)"
-          accept="image/*"
-          class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-        >
-      </div>
-
-      <!-- Title Input -->
-      <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-300">Title</label>
-        <input
-          type="text"
-          formControlName="title"
-          class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-        >
-        <div *ngIf="updateForm.get('title')?.errors?.['required'] && updateForm.get('title')?.touched" 
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Title Input -->
+        <div class="space-y-2">
+          <label for="title" class="block text-sm font-medium text-gray-300">Title</label>
+          <input
+            type="text"
+            id="title"
+            formControlName="title"
+            class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+          >
+          <p *ngIf="updateForm.get('title')?.errors?.['required'] && updateForm.get('title')?.touched" 
              class="text-red-400 text-sm mt-1">
-          Title is required
+            Title is required
+          </p>
         </div>
-      </div>
 
-      <!-- Artist Input -->
-      <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-300">Artist</label>
-        <input
-          type="text"
-          formControlName="artist"
-          class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-        >
-        <div *ngIf="updateForm.get('artist')?.errors?.['required'] && updateForm.get('artist')?.touched"
+        <!-- Artist Input -->
+        <div class="space-y-2">
+          <label for="artist" class="block text-sm font-medium text-gray-300">Artist</label>
+          <input
+            type="text"
+            id="artist"
+            formControlName="artist"
+            class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+          >
+          <p *ngIf="updateForm.get('artist')?.errors?.['required'] && updateForm.get('artist')?.touched"
              class="text-red-400 text-sm mt-1">
-          Artist is required
+            Artist is required
+          </p>
         </div>
       </div>
 
       <!-- Category Input -->
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-300">Category</label>
-        <input
-          type="text"
+        <label for="category" class="block text-sm font-medium text-gray-300">Category</label>
+        <select
+          id="category"
           formControlName="category"
           class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
         >
+          <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+        </select>
       </div>
 
       <!-- Description Input -->
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-300">Description</label>
+        <label for="description" class="block text-sm font-medium text-gray-300">Description</label>
         <textarea
+          id="description"
           formControlName="description"
           rows="3"
           class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
         ></textarea>
       </div>
 
-      <!-- Submit Button -->
-      <div class="flex justify-end space-x-4">
+      <!-- File Inputs -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Audio File Input -->
+        <div class="space-y-2">
+          <label for="audioFile" class="block text-sm font-medium text-gray-300">Audio File</label>
+          <input
+            type="file"
+            id="audioFile"
+            (change)="onFileChange($event)"
+            accept="audio/*"
+            class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+          >
+          <div *ngIf="audioFileError" class="text-red-400 text-sm mt-1">
+            {{ audioFileError }}
+          </div>
+        </div>
+
+        <!-- Image File Input -->
+        <div class="space-y-2">
+          <label for="imageFile" class="block text-sm font-medium text-gray-300">Cover Image</label>
+          <input
+            type="file"
+            id="imageFile"
+            (change)="onImageChange($event)"
+            accept="image/*"
+            class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+          >
+        </div>
+      </div>
+
+      <!-- Submit and Cancel Buttons -->
+      <div class="flex justify-end space-x-4 mt-8">
         <button
           type="button"
           (click)="onCancel()"
@@ -113,4 +136,3 @@
     </form>
   </div>
 </div>
-

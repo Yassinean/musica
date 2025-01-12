@@ -194,42 +194,35 @@ export class TrackService {
     );
   }
 
-  updateTrack(updatedTrack: Track, audioFile: Blob, imageFile?: Blob): Observable<Track> {
-    return new Observable<Track>((observer) => {
-      this.saveTrackMetadata(updatedTrack).subscribe({
-        next: () => {
-          console.log('Track metadata updated successfully');
-          this.saveAudioFile(updatedTrack.id, audioFile).subscribe({
-            next: () => {
-              console.log('Audio file updated successfully');
+  updateTrack(updatedTrack: Track, audioFile: Blob | null, imageFile?: Blob | null): Observable<Track> {
+    if (!this.db) {
+      return throwError(() => new Error('Database not initialized'));
+    }
 
-              if (imageFile) {
-                this.saveImageCover(updatedTrack.id, imageFile).subscribe({
-                  next: () => {
-                    console.log('Image file updated successfully');
-                    observer.next(updatedTrack);
-                    observer.complete();
-                  },
-                  error: (err) => {
-                    console.error('Error updating image file:', err);
-                    observer.error(err);
-                  }
-                });
-              } else {
-                observer.next(updatedTrack);
-                observer.complete();
-              }
-            },
-            error: (err) => {
-              console.error('Error updating audio file:', err);
-              observer.error(err);
-            },
-          });
+    return new Observable<Track>((observer) => {
+      // First save track metadata
+      this.saveTrackMetadata(updatedTrack).subscribe({
+        next: async () => {
+          try {
+            // Handle audio file update if provided
+            if (audioFile) {
+              await this.saveAudioFile(updatedTrack.id, audioFile).toPromise();
+            }
+
+            // Handle image file update if provided
+            if (imageFile) {
+              await this.saveImageCover(updatedTrack.id, imageFile).toPromise();
+            }
+
+            observer.next(updatedTrack);
+            observer.complete();
+          } catch (error) {
+            observer.error(error);
+          }
         },
         error: (err) => {
-          console.error('Error updating track metadata:', err);
           observer.error(err);
-        },
+        }
       });
     });
   }

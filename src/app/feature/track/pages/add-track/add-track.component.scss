@@ -1,0 +1,25 @@
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: -2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: -4s;
+  }
+
+  input[type="file"] {
+    @apply cursor-pointer;
+  }
+
+  input[type="file"]::file-selector-button {
+    @apply bg-purple-600 text-white px-4 py-2 rounded-full border-0 text-sm font-semibold cursor-pointer transition-colors duration-300 hover:bg-purple-700;
+  }

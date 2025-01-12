@@ -36,6 +36,8 @@ export class UpdateTrackComponent implements OnInit, OnDestroy {
   error$!: Observable<string | null>;
   audioFileError: string | null = null;
   private readonly maxAudioSize = 10; // MB
+  selectedImageFile: File | null = null;
+  currentTrackId: string | null = null;
 
   constructor(private readonly formBuilder:FormBuilder ,
               private activateRoute:ActivatedRoute ,
@@ -50,40 +52,36 @@ export class UpdateTrackComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const trackId = this.activateRoute.snapshot.paramMap.get('id'); // Get ID from the route
+    const trackId = this.activateRoute.snapshot.paramMap.get('id');
     if (trackId) {
-      // Dispatch an action or fetch the track using the store
+      this.currentTrackId = trackId;
       this.store.dispatch(TrackActions.loadTrack({ id: trackId }));
-
-      // Subscribe to track$ to get the track data and initialize the form
-      this.track$ = this.store.select(selectTrackById(trackId)); // Assuming you have a selector for tracks
-      this.track$.subscribe(track => {
+      this.track$ = this.store.select(selectTrackById(trackId));
+      
+      this.track$.pipe(takeUntil(this.destroy$)).subscribe(track => {
         if (track) {
-          this.initializeForm(track); // Initialize form with track data
+          this.initializeForm(track);
+          if (track.imageFileId) {
+            this.trackService.getImageFileUrl(track.imageFileId).subscribe({
+              next: (url) => {
+                if (typeof url === 'string') {
+                  this.currentImageUrl = url;
+                  this.imagePreview = url;
+                } else {
+                  this.currentImageUrl = this.defaultCoverImage;
+                }
+              },
+              error: () => {
+                this.currentImageUrl = this.defaultCoverImage;
+                this.imageLoadError = true;
+              }
+            });
+          } else {
+            this.currentImageUrl = this.defaultCoverImage;
+          }
         }
       });
     }
-
-    // Add this to load the image
-    this.track$.pipe(takeUntil(this.destroy$)).subscribe(track => {
-      if (track?.imageFileId) {
-        this.trackService.getImageFileUrl(track.imageFileId).subscribe({
-          next: (url) => {
-            if (typeof url === 'string') {
-              this.currentImageUrl = url;
-            } else {
-              this.currentImageUrl = this.defaultCoverImage;
-            }
-          },
-          error: () => {
-            this.currentImageUrl = this.defaultCoverImage;
-            this.imageLoadError = true;
-          }
-        });
-      } else {
-        this.currentImageUrl = this.defaultCoverImage;
-      }
-    });
   }
 
   initializeForm(track: Track): void {
@@ -121,19 +119,17 @@ export class UpdateTrackComponent implements OnInit, OnDestroy {
   }
   onImageChange(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
-
     if (file) {
       if (this.validateUpdateImageFile(file)) {
-        this.updateForm.patchValue({ imageFile: file });
-
+        this.selectedImageFile = file;
         const reader = new FileReader();
         reader.onload = () => {
           this.imagePreview = reader.result as string;
         };
         reader.readAsDataURL(file);
       } else {
-        this.updateForm.patchValue({ imageFile: null });
-        this.imagePreview = null;
+        this.selectedImageFile = null;
+        this.imagePreview = this.currentImageUrl;
       }
     }
   }
@@ -178,19 +174,28 @@ export class UpdateTrackComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.updateForm.valid) {
-      const updatedTrack = {
-        ...this.updateForm.value,
-        audioFile: this.selectedAudioFile || null,
-      };
+      const formValue = this.updateForm.value;
 
       this.track$.pipe(take(1)).subscribe(track => {
         if (track) {
-          updatedTrack.id = track.id;
+          const updatedTrack = {
+            ...track,
+            title: formValue.title,
+            artist: formValue.artist,
+            description: formValue.description,
+            category: formValue.category,
+          };
+
+          // Dispatch update action with files if they exist
           this.store.dispatch(
-            TrackActions.updateTrack({ updatedTrack, audioFile: this.selectedAudioFile })
+            TrackActions.updateTrack({ 
+              updatedTrack, 
+              audioFile: this.selectedAudioFile || null,
+              imageFile: this.selectedImageFile || null
+            })
           );
-          
-          // Wait for the update operation to complete
+
+          // Wait for the update to complete
           setTimeout(() => {
             this.store.dispatch(TrackActions.loadTracks());
             this.route.navigate(['/library']);

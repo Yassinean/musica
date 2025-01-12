@@ -1,5 +1,12 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 text-white py-16 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-3xl mx-auto">
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
+    <div class="absolute top-1/2 right-0 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float animation-delay-2000"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float animation-delay-4000"></div>
+  </div>
+
+  <div class="max-w-3xl mx-auto relative">
     <h1 class="text-4xl font-bold text-center mb-8">
       <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
         Add New Track
@@ -7,63 +14,117 @@
     </h1>
 
     <form [formGroup]="trackForm" (ngSubmit)="onSubmit()" class="space-y-6 bg-white/10 backdrop-blur-lg rounded-xl p-8 shadow-xl">
-      <div>
-        <label for="title" class="block text-sm font-medium text-gray-300">Title</label>
-        <input type="text" id="title" formControlName="title" class="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-        <p *ngIf="trackForm.get('title')?.errors?.['required'] && trackForm.get('title')?.touched" class="mt-1 text-sm text-red-400">Title is required</p>
-        <p *ngIf="trackForm.get('title')?.errors?.['maxlength']" class="mt-1 text-sm text-red-400">Title must be 40 characters or less</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Title Input -->
+        <div class="space-y-2">
+          <label for="title" class="block text-sm font-medium text-gray-300">Title</label>
+          <input
+            type="text"
+            id="title"
+            formControlName="title"
+            class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+          >
+          <p *ngIf="trackForm.get('title')?.errors?.['required'] && trackForm.get('title')?.touched" class="text-red-400 text-sm mt-1">
+            Title is required
+          </p>
+          <p *ngIf="trackForm.get('title')?.errors?.['maxlength']" class="text-red-400 text-sm mt-1">
+            Title must be 40 characters or less
+          </p>
+        </div>
+
+        <!-- Artist Input -->
+        <div class="space-y-2">
+          <label for="artist" class="block text-sm font-medium text-gray-300">Artist</label>
+          <input
+            type="text"
+            id="artist"
+            formControlName="artist"
+            class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+          >
+          <p *ngIf="trackForm.get('artist')?.errors?.['required'] && trackForm.get('artist')?.touched" class="text-red-400 text-sm mt-1">
+            Artist is required
+          </p>
+        </div>
       </div>
 
-      <div>
-        <label for="artist" class="block text-sm font-medium text-gray-300">Artist</label>
-        <input type="text" id="artist" formControlName="artist" class="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-        <p *ngIf="trackForm.get('artist')?.errors?.['required'] && trackForm.get('artist')?.touched" class="mt-1 text-sm text-red-400">Artist is required</p>
-      </div>
-
-      <div>
+      <!-- Description Input -->
+      <div class="space-y-2">
         <label for="description" class="block text-sm font-medium text-gray-300">Description</label>
-        <textarea id="description" formControlName="description" rows="3" class="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
-        <p *ngIf="trackForm.get('description')?.errors?.['maxlength']" class="mt-1 text-sm text-red-400">Description must be 200 characters or less</p>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="3"
+          class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+        ></textarea>
+        <p *ngIf="trackForm.get('description')?.errors?.['maxlength']" class="text-red-400 text-sm mt-1">
+          Description must be 200 characters or less
+        </p>
       </div>
 
-      <div>
+      <!-- Category Input -->
+      <div class="space-y-2">
         <label for="category" class="block text-sm font-medium text-gray-300">Category</label>
-        <select id="category" formControlName="category" class="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        <select
+          id="category"
+          formControlName="category"
+          class="w-full px-3 py-2 bg-purple-900 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+        >
           <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
         </select>
       </div>
 
-      <div>
-        <label for="audioFile" class="block text-sm font-medium text-gray-300">Audio File</label>
-        <input type="file" id="audioFile" (change)="onFileChange($event)" accept="audio/*" class="mt-1 block w-full text-sm text-gray-300
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-full file:border-0
-          file:text-sm file:font-semibold
-          file:bg-indigo-600 file:text-white
-          hover:file:bg-indigo-700">
-        <p *ngIf="trackForm.get('audioFile')?.errors?.['required'] && trackForm.get('audioFile')?.touched" class="mt-1 text-sm text-red-400">Audio file is required</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Audio File Input -->
+        <div class="space-y-2">
+          <label for="audioFile" class="block text-sm font-medium text-gray-300">Audio File</label>
+          <input
+            type="file"
+            id="audioFile"
+            (change)="onFileChange($event)"
+            accept="audio/*"
+            class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+          >
+          <p *ngIf="trackForm.get('audioFile')?.errors?.['required'] && trackForm.get('audioFile')?.touched" class="text-red-400 text-sm mt-1">
+            Audio file is required
+          </p>
+          <p *ngIf="audioFileError" class="text-red-400 text-sm mt-1">{{ audioFileError }}</p>
+        </div>
+
+        <!-- Image File Input -->
+        <div class="space-y-2">
+          <label for="imageFile" class="block text-sm font-medium text-gray-300">Cover Image</label>
+          <input
+            type="file"
+            id="imageFile"
+            (change)="onImageChange($event)"
+            accept="image/*"
+            class="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+          >
+          <p *ngIf="trackForm.get('imageFile')?.errors?.['required'] && trackForm.get('imageFile')?.touched" class="text-red-400 text-sm mt-1">
+            Cover image is required
+          </p>
+        </div>
       </div>
 
-      <div>
-        <label for="imageFile" class="block text-sm font-medium text-gray-300">Cover Image</label>
-        <input type="file" id="imageFile" (change)="onImageChange($event)" accept="image/*" class="mt-1 block w-full text-sm text-gray-300
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-full file:border-0
-          file:text-sm file:font-semibold
-          file:bg-indigo-600 file:text-white
-          hover:file:bg-indigo-700">
-        <p *ngIf="trackForm.get('imageFile')?.errors?.['required'] && trackForm.get('imageFile')?.touched" class="mt-1 text-sm text-red-400">Cover image is required</p>
-      </div>
-
+      <!-- Image Preview -->
       <div *ngIf="imagePreview" class="mt-4">
         <img [src]="imagePreview" alt="Cover Preview" class="max-w-full h-auto rounded-lg shadow-lg">
-        <button type="button" (click)="removeImage()" class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+        <button
+          type="button"
+          (click)="removeImage()"
+          class="mt-2 px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300"
+        >
           Remove Image
         </button>
       </div>
 
+      <!-- Submit Button -->
       <div>
-        <button type="submit" [disabled]="trackForm.invalid" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+        <button
+          type="submit"
+          [disabled]="trackForm.invalid"
+          class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+        >
           Add Track
         </button>
       </div>

@@ -53,15 +53,12 @@ export class TrackEffects {
   updateTrack$ = createEffect(() =>
     this.action$.pipe(
       ofType(TrackActions.updateTrack),
-      mergeMap(({ updatedTrack, audioFile }) => {
-        if (!audioFile) {
-          return of(
-            TrackActions.updateTrackFailure({
-              error: 'Audio file is required but was not provided.',
-            })
-          );
-        }
-        return this.trackService.updateTrack(updatedTrack, audioFile).pipe(
+      mergeMap(({ updatedTrack, audioFile, imageFile }) => {
+        // Convert File to Blob if needed
+        const audioBlob = audioFile instanceof File ? audioFile : audioFile;
+        const imageBlob = imageFile instanceof File ? imageFile : imageFile;
+        
+        return this.trackService.updateTrack(updatedTrack, audioBlob, imageBlob).pipe(
           map((track) => TrackActions.updateTrackSuccess({ track })),
           catchError((error) => of(TrackActions.updateTrackFailure({ error })))
         );
