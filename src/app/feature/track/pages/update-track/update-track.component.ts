@@ -1,37 +1,52 @@
-import { Component } from '@angular/core';
-import {NgForOf, NgIf} from "@angular/common";
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MusicCategory, Track} from "../../../../core/models/track.model";
 import {Store} from "@ngrx/store";
 import * as TrackActions from "../../../store/track.actions";
-import {Observable} from "rxjs";
+import {Observable, takeUntil, Subject, take} from "rxjs";
 import {ActivatedRoute, Router} from "@angular/router";
 import {selectTrackById} from "../../../store/track.selectors";
+import { TrackService } from '../../../../core/service/track.service';
 
 @Component({
   selector: 'app-update-track',
   standalone: true,
-    imports: [
-        NgForOf,
-        NgIf,
-        ReactiveFormsModule
-    ],
+  imports: [
+    NgForOf,
+    NgIf,
+    ReactiveFormsModule,
+    AsyncPipe
+  ],
   templateUrl: './update-track.component.html',
   styleUrl: './update-track.component.scss'
 })
-export class UpdateTrackComponent {
+export class UpdateTrackComponent implements OnInit, OnDestroy {
 
-  trackForm!: FormGroup;
+  updateForm!: FormGroup;
   track$!: Observable<Track | undefined>;
   imagePreview:string | null = null;
   categories: MusicCategory[] = Object.values(MusicCategory);
   selectedAudioFile!: File | null;
+  currentImageUrl: string = '';
+  readonly defaultCoverImage = 'https://res.cloudinary.com/dz4pww2qv/image/upload/v1735915190/apbake6pbviilhdi1brd.jpg';
+  imageLoadError = false;
+  private readonly destroy$ = new Subject<void>();
+  isLoading$!: Observable<boolean>;
+  error$!: Observable<string | null>;
+  audioFileError: string | null = null;
+  private readonly maxAudioSize = 10; // MB
 
   constructor(private readonly formBuilder:FormBuilder ,
               private activateRoute:ActivatedRoute ,
               private store:Store ,
-              private route:Router
+              private route:Router,
+              private trackService: TrackService
   ) {
+    // @ts-ignore
+    this.isLoading$ = this.store.select(state => state. track?.loading ?? false);
+    // @ts-ignore
+    this.error$ = this.store.select(state => state.track?.error ?? null);
   }
 
   ngOnInit(): void {
@@ -48,10 +63,31 @@ export class UpdateTrackComponent {
         }
       });
     }
+
+    // Add this to load the image
+    this.track$.pipe(takeUntil(this.destroy$)).subscribe(track => {
+      if (track?.imageFileId) {
+        this.trackService.getImageFileUrl(track.imageFileId).subscribe({
+          next: (url) => {
+            if (typeof url === 'string') {
+              this.currentImageUrl = url;
+            } else {
+              this.currentImageUrl = this.defaultCoverImage;
+            }
+          },
+          error: () => {
+            this.currentImageUrl = this.defaultCoverImage;
+            this.imageLoadError = true;
+          }
+        });
+      } else {
+        this.currentImageUrl = this.defaultCoverImage;
+      }
+    });
   }
 
   initializeForm(track: Track): void {
-    this.trackForm = this.formBuilder.group({
+    this.updateForm = this.formBuilder.group({
       title: [track.title, [Validators.required]],
       artist: [track.artist, [Validators.required]],
       description: [track.description],
@@ -88,7 +124,7 @@ export class UpdateTrackComponent {
 
     if (file) {
       if (this.validateUpdateImageFile(file)) {
-        this.trackForm.patchValue({ imageFile: file });
+        this.updateForm.patchValue({ imageFile: file });
 
         const reader = new FileReader();
         reader.onload = () => {
@@ -96,46 +132,81 @@ export class UpdateTrackComponent {
         };
         reader.readAsDataURL(file);
       } else {
-        this.trackForm.patchValue({ imageFile: null });
+        this.updateForm.patchValue({ imageFile: null });
         this.imagePreview = null;
       }
     }
   }
   removeImage(): void {
-    this.trackForm.patchValue({ imageFile: null });
+    this.updateForm.patchValue({ imageFile: null });
     this.imagePreview = null;
   }
 
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.selectedAudioFile = input.files[0];
-      this.trackForm.patchValue({ audioFile: this.selectedAudioFile.name });
+      const file = input.files[0];
+      if (this.validateAudioFile(file)) {
+        this.selectedAudioFile = file;
+        this.updateForm.patchValue({ audioFile: this.selectedAudioFile.name });
+        this.audioFileError = null;
+      }
     }
   }
 
+  validateAudioFile(file: File): boolean {
+    const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/ogg'];
+
+    if (file.size > this.maxAudioSize * 1024 * 1024) {
+      this.audioFileError = `Audio file size must be less than ${this.maxAudioSize}MB`;
+      return false;
+    }
+
+    if (!allowedTypes.includes(file.type)) {
+      this.audioFileError = 'Invalid audio format. Please use MP3, WAV, or OGG';
+      return false;
+    }
+
+    return true;
+  }
+
+  onCancel(): void {
+    this.route.navigate(['/library']).catch(err => {
+      console.error('Navigation error:', err);
+    });
+  }
+
   onSubmit(): void {
-    if (this.trackForm.valid) {
+    if (this.updateForm.valid) {
       const updatedTrack = {
-        ...this.trackForm.value,
+        ...this.updateForm.value,
         audioFile: this.selectedAudioFile || null,
       };
 
-      this.track$.subscribe(track => {
+      this.track$.pipe(take(1)).subscribe(track => {
         if (track) {
-          updatedTrack.id = track.id; // Add the track ID from the observable
+          updatedTrack.id = track.id;
           this.store.dispatch(
             TrackActions.updateTrack({ updatedTrack, audioFile: this.selectedAudioFile })
           );
+          
+          // Wait for the update operation to complete
           setTimeout(() => {
-            this.route.navigate(['/library']).catch(err => {
-              console.error('Navigation error:', err);
-            });
-          }, 2000);
+            this.store.dispatch(TrackActions.loadTracks());
+            this.route.navigate(['/library']);
+          }, 1000);
         }
       });
-    } else {
-      console.error('Form is invalid');
     }
+  }
+
+  handleImageError(): void {
+    this.currentImageUrl = this.defaultCoverImage;
+    this.imageLoadError = true;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

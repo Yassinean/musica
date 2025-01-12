@@ -9,6 +9,7 @@ import { NavbarComponent } from "../../../../shared/layout/navbar/navbar.compone
 import { FormsModule } from "@angular/forms";
 import { AsyncPipe } from "@angular/common";
 import { SearchTrackPipe } from "../../../../shared/pipe/search-track.pipe";
+import { PlayerControlsComponent } from '../../../../shared/components/player-controls/player-controls.component';
 
 @Component({
   selector: 'app-library-page',
@@ -19,7 +20,8 @@ import { SearchTrackPipe } from "../../../../shared/pipe/search-track.pipe";
     NavbarComponent,
     FormsModule,
     AsyncPipe,
-    SearchTrackPipe
+    SearchTrackPipe,
+    PlayerControlsComponent
   ],
   templateUrl: './library-page.component.html',
   styleUrl: './library-page.component.scss'

@@ -24,6 +24,9 @@ export class AudioService {
 
   private playlist: Track[] = [];
 
+  private readonly currentTrackSubject: BehaviorSubject<Track | null> = new BehaviorSubject<Track | null>(null);
+  public currentTrack$ = this.currentTrackSubject.asObservable();
+
   constructor(private readonly trackService: TrackService) {
     this.audioContext = new AudioContext();
     this.audioElement = new Audio();
@@ -63,6 +66,7 @@ export class AudioService {
     try {
       if (this.currentTrack?.id !== track.id) {
         this.currentTrack = track;
+        this.currentTrackSubject.next(track);
         this.playerStateSubject.next(PlayerState.LOADING);
         const audioFile = await this.trackService.getAudioFile(track.id).toPromise();
         if (!audioFile) {
@@ -97,9 +101,9 @@ export class AudioService {
     this.audioElement.volume = Math.max(0, Math.min(1, volume));
   }
 
-  setProgress(timeInMs: number): void {
+  setProgress(time: number): void {
     if (this.audioElement.duration) {
-      this.audioElement.currentTime = timeInMs / 1000;
+      this.audioElement.currentTime = time * 1000;
     }
   }
 
