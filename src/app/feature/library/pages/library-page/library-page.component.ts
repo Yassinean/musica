@@ -7,7 +7,7 @@ import { LibraryCategoriesComponent } from "../../components/library-categories/
 import { LibraryListComponent } from "../../components/library-list/library-list.component";
 import { NavbarComponent } from "../../../../shared/layout/navbar/navbar.component";
 import { FormsModule } from "@angular/forms";
-import { AsyncPipe } from "@angular/common";
+import { AsyncPipe, CommonModule } from "@angular/common";
 import { SearchTrackPipe } from "../../../../shared/pipe/search-track.pipe";
 import { PlayerControlsComponent } from '../../../../shared/components/player-controls/player-controls.component';
 
@@ -15,6 +15,7 @@ import { PlayerControlsComponent } from '../../../../shared/components/player-co
   selector: 'app-library-page',
   standalone: true,
   imports: [
+    CommonModule,
     LibraryCategoriesComponent,
     LibraryListComponent,
     NavbarComponent,
@@ -24,7 +25,7 @@ import { PlayerControlsComponent } from '../../../../shared/components/player-co
     PlayerControlsComponent
   ],
   templateUrl: './library-page.component.html',
-  styleUrl: './library-page.component.scss'
+  styleUrl:'./library-page.component.scss'
 })
 export class LibraryPageComponent {
   searchQuery: string = '';
@@ -34,3 +35,4 @@ export class LibraryPageComponent {
     this.tracks$ = this.store.select(selectAllTracks);
   }
 }
+

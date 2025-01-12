@@ -8,71 +8,82 @@
 
   <div class="relative max-w-4xl mx-auto">
     <ng-container *ngIf="track$ | async as track; else loading">
-      <div class="flex flex-col md:flex-row items-center md:items-start space-y-8 md:space-y-0 md:space-x-8">
+      <div class="flex flex-col lg:flex-row items-center lg:items-start space-y-8 lg:space-y-0 lg:space-x-12">
         <!-- Album Cover -->
-        <div class="w-64 h-64 rounded-lg overflow-hidden shadow-lg">
+        <div class="w-64 h-64 lg:w-80 lg:h-80 rounded-2xl overflow-hidden shadow-2xl transform transition-all duration-300 hover:scale-105">
           <img [src]="currentImageUrl || defaultCoverImage" [alt]="track.title + ' cover'" class="w-full h-full object-cover">
         </div>
 
-        <!-- Track Details -->
-        <div class="flex-1 text-center md:text-left">
-          <h1 class="text-4xl font-bold mb-2">{{ track.title }}</h1>
+        <!-- Track Details and Controls -->
+        <div class="flex-1 text-center lg:text-left">
+          <h1 class="text-4xl lg:text-5xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">{{ track.title }}</h1>
           <p class="text-xl text-gray-300 mb-4">{{ track.artist }}</p>
-          <p class="text-gray-400 mb-6">{{ track.description }}</p>
-          <p class="text-gray-400 mb-6">{{ track.category }}</p>
+          <p class="text-gray-400 mb-4">{{ track.description }}</p>
+          <p class="text-sm text-purple-400 mb-6 uppercase tracking-wide">{{ track.category }}</p>
 
           <!-- Player Controls -->
-          <div class="flex justify-center md:justify-start items-center space-x-4 mb-6">
-            <button (click)="playPrevious()" class="text-white hover:text-purple-400 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="flex justify-center lg:justify-start items-center space-x-6 mb-8">
+            <button (click)="playPrevious()" class="text-white hover:text-purple-400 transition-colors focus:outline-none" aria-label="Previous track">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
               </svg>
             </button>
-            <button (click)="handlePlayClick()" class="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-3 transition-colors">
-              <svg *ngIf="playerState !== 'STOPPED'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button (click)="handlePlayClick()" class="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-4 transition-all duration-300 transform hover:scale-110 focus:outline-none" aria-label="Play or pause">
+              <svg *ngIf="playerState !== 'PLAYING'" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
               </svg>
-              <svg *ngIf="playerState === 'PLAYING'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg *ngIf="playerState === 'PLAYING'" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </button>
-            <button (click)="playNext()" class="text-white hover:text-purple-400 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button (click)="playNext()" class="text-white hover:text-purple-400 transition-colors focus:outline-none" aria-label="Next track">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
               </svg>
             </button>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="mb-4">
             <div class="relative">
-              <button (click)="toggleVolumeSlider()" class="text-white hover:text-purple-400 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                </svg>
-              </button>
+              <div class="overflow-hidden h-2 text-xs flex rounded bg-purple-200">
+                <div [style.width.%]="getProgress()" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-500"></div>
+              </div>
               <input
-                *ngIf="showVolumeSlider"
+                type="range"
+                min="0"
+                max="100"
+                [value]="getProgress()"
+                (input)="onProgressChange($event)"
+                class="absolute top-0 left-0 w-full h-2 opacity-0 cursor-pointer"
+              >
+            </div>
+            <div class="flex justify-between text-sm text-gray-400 mt-1">
+              <span>{{ formatTime(currentTime) }}</span>
+              <span>{{ formatTime(duration) }}</span>
+            </div>
+          </div>
+
+          <!-- Volume Control -->
+          <div class="flex items-center justify-center lg:justify-start space-x-4">
+            <button (click)="toggleVolumeSlider()" class="text-white hover:text-purple-400 transition-colors focus:outline-none" aria-label="Toggle volume control">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              </svg>
+            </button>
+            <div *ngIf="showVolumeSlider" class="relative w-32">
+              <div class="overflow-hidden h-2 text-xs flex rounded bg-purple-200">
+                <div [style.width.%]="volume * 100" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-500"></div>
+              </div>
+              <input
                 type="range"
                 min="0"
                 max="1"
                 step="0.01"
                 [value]="volume"
                 (input)="onVolumeChange($event)"
-                class="absolute left-0 bottom-full mb-2 w-32 appearance-none bg-purple-200 h-1 rounded-full outline-none"
+                class="absolute top-0 left-0 w-full h-2 opacity-0 cursor-pointer"
               >
-            </div>
-          </div>
-
-          <!-- Progress Bar -->
-          <div class="mb-4">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              [value]="getProgress()"
-              (input)="onProgressChange($event)"
-              class="w-full appearance-none bg-purple-200 h-1 rounded-full outline-none"
-            >
-            <div class="flex justify-between text-sm text-gray-400 mt-1">
-              <span>{{ formatTime(currentTime) }}</span>
-              <span>{{ formatTime(duration) }}</span>
             </div>
           </div>
         </div>
@@ -81,7 +92,7 @@
 
     <ng-template #loading>
       <div class="flex justify-center items-center h-64">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
       </div>
     </ng-template>
   </div>

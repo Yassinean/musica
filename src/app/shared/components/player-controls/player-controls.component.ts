@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AudioService } from '../../../core/service/audio.service';
 import { PlayerState, Track } from '../../../core/models/track.model';
@@ -10,12 +11,7 @@ import { Subject, takeUntil } from 'rxjs';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './player-controls.component.html',
-  styles: [`
-    :host {
-      display: block;
-      height: 72px;
-    }
-  `]
+  styleUrl: './player-controls.component.scss',
 })
 export class PlayerControlsComponent implements OnInit, OnDestroy {
   currentTrack: Track | null = null;
@@ -25,25 +21,31 @@ export class PlayerControlsComponent implements OnInit, OnDestroy {
   volume: number = 1;
   showVolumeControl: boolean = false;
   private destroy$ = new Subject<void>();
-  readonly defaultImage = 'https://res.cloudinary.com/dz4pww2qv/image/upload/v1735915190/apbake6pbviilhdi1brd.jpg';
+  readonly defaultImage =
+    'https://res.cloudinary.com/dz4pww2qv/image/upload/v1735915190/apbake6pbviilhdi1brd.jpg';
 
   constructor(
     private audioService: AudioService,
-    private store: Store
+    private store: Store,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.audioService.currentTrack$.pipe(takeUntil(this.destroy$))
-      .subscribe(track => this.currentTrack = track);
-    
-    this.audioService.playerState$.pipe(takeUntil(this.destroy$))
-      .subscribe(state => this.playerState = state);
-    
-    this.audioService.currentTime$.pipe(takeUntil(this.destroy$))
-      .subscribe(time => this.currentTime = time);
-    
-    this.audioService.duration$.pipe(takeUntil(this.destroy$))
-      .subscribe(duration => this.duration = duration);
+    this.audioService.currentTrack$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((track) => (this.currentTrack = track));
+
+    this.audioService.playerState$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((state) => (this.playerState = state));
+
+    this.audioService.currentTime$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((time) => (this.currentTime = time));
+
+    this.audioService.duration$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((duration) => (this.duration = duration));
   }
 
   ngOnDestroy(): void {
@@ -101,4 +103,10 @@ export class PlayerControlsComponent implements OnInit, OnDestroy {
   handleImageError(event: Event): void {
     (event.target as HTMLImageElement).src = this.defaultImage;
   }
-} 
+
+  navigateToTrackDetails(): void {
+    if (this.currentTrack) {
+      this.router.navigate(['/track', this.currentTrack.id]);
+    }
+  }
+}

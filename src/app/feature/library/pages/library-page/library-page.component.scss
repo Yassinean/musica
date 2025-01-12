@@ -1,4 +1,3 @@
-
 @keyframes float {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
@@ -6,14 +5,13 @@
 }
 
 .animate-float {
-  animation: float 15s ease-in-out infinite;
+  animation: float 6s ease-in-out infinite;
 }
 
 .animation-delay-2000 {
-  animation-delay: -5s;
+  animation-delay: -2s;
 }
 
 .animation-delay-4000 {
-  animation-delay: -10s;
+  animation-delay: -4s;
 }
-

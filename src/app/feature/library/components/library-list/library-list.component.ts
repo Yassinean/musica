@@ -38,6 +38,7 @@ export class LibraryListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   protected readonly imageLoadError = new BehaviorSubject<{ [key: string]: boolean }>({});
   imageUrls: { [trackId: string]: string } = {};
+  currentTrack: Track | null = null;
 
   readonly defaultCoverImage = 'https://res.cloudinary.com/dz4pww2qv/image/upload/v1735915190/apbake6pbviilhdi1brd.jpg';
 
@@ -52,6 +53,8 @@ export class LibraryListComponent implements OnInit, OnDestroy {
     this.isLoading$ = this.store.select(selectTrackLoading);
     this.playerStateSubscription = this.audioPlayer.playerState$.pipe(takeUntil(this.destroy$))
       .subscribe(state => this.playerState = state);
+    this.audioPlayer.currentTrack$.pipe(takeUntil(this.destroy$))
+      .subscribe(track => this.currentTrack = track);
   }
 
   ngOnInit(): void {
@@ -122,7 +125,7 @@ export class LibraryListComponent implements OnInit, OnDestroy {
     }
 
     if (this.isBlobUrl(imageUrl)) {
-      console.log(`Using blob URL for track ${track.id}:`, imageUrl);
+
       return imageUrl;
     }
     const hasError = this.imageLoadError.value[track.id];
@@ -167,14 +170,30 @@ export class LibraryListComponent implements OnInit, OnDestroy {
     this.closeDropdown(trackId);
   }
 
+  togglePlay(track: Track, event: Event): void {
+    event.stopPropagation(); // Prevent navigation
+    if (this.isCurrentTrack(track) && this.playerState === PlayerState.PLAYING) {
+      this.audioPlayer.pause();
+    } else {
+      this.audioPlayer.play(track).catch(error => {
+        console.error('Error playing track:', error);
+      });
+    }
+  }
+
   navigateToTrackDetails(track: Track): void {
-    this.audioPlayer.play(track).catch(error => {
-      console.error('Error playing track:', error);
-    });
     this.router.navigate(['/track', track.id]).then(() => {
       console.log('Navigated to track details');
     }).catch(err => {
       console.error('Navigation error:', err);
     });
+  }
+
+  isTrackPlaying(track: Track): boolean {
+    return this.currentTrack?.id === track.id && this.playerState === PlayerState.PLAYING;
+  }
+
+  isCurrentTrack(track: Track): boolean {
+    return this.currentTrack?.id === track.id;
   }
 }
