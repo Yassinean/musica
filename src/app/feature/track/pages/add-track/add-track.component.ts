@@ -24,7 +24,7 @@ export class AddTrackComponent {
       title: ['', [Validators.required, Validators.maxLength(40)]],
       artist: ['', Validators.required],
       description: ['', [Validators.maxLength(200)]],
-      category: [MusicCategory.POP],
+      category: [MusicCategory.OTHER],
       audioFile: [null, Validators.required],
       imageFile: [null , Validators.required]
     });

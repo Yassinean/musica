@@ -1,14 +1,15 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {AsyncPipe, DatePipe, NgForOf, NgIf} from "@angular/common";
-import {FormsModule} from "@angular/forms";
-import {PlayerState, Track} from "../../../../core/models/track.model";
-import {BehaviorSubject, Observable, Subject, Subscription, takeUntil} from "rxjs";
-import {Store} from "@ngrx/store";
-import {Router} from "@angular/router";
-import {AudioService} from "../../../../core/service/audio.service";
-import {TrackService} from "../../../../core/service/track.service";
-import {selectFilteredTracks, selectTrackError, selectTrackLoading} from "../../../store/track.selectors";
+import { Component, OnDestroy, OnInit, Input } from '@angular/core';
+import { AsyncPipe, DatePipe, NgForOf, NgIf } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { PlayerState, Track } from "../../../../core/models/track.model";
+import { BehaviorSubject, Observable, Subject, Subscription, takeUntil } from "rxjs";
+import { Store } from "@ngrx/store";
+import { Router } from "@angular/router";
+import { AudioService } from "../../../../core/service/audio.service";
+import { TrackService } from "../../../../core/service/track.service";
+import { selectFilteredTracks, selectTrackError, selectTrackLoading } from "../../../store/track.selectors";
 import * as TrackActions from "../../../store/track.actions";
+import { SearchTrackPipe } from "../../../../shared/pipe/search-track.pipe";
 
 @Component({
   selector: 'app-library-list',
@@ -19,18 +20,20 @@ import * as TrackActions from "../../../store/track.actions";
     FormsModule,
     AsyncPipe,
     DatePipe,
-
+    SearchTrackPipe
   ],
   templateUrl: './library-list.component.html',
-  styleUrls: ['./library-list.component.scss'], // Corrected styleUrl to styleUrls
+  styleUrls: ['./library-list.component.scss'],
 })
 export class LibraryListComponent implements OnInit, OnDestroy {
+  @Input() tracks: Track[] | null = null;
+  @Input() searchTerm: string = '';
+
   tracks$: Observable<Track[]>;
   trackError$: Observable<string | null>;
   isLoading$: Observable<boolean>;
   openDropdownId: string | null = null;
   playerState: PlayerState = PlayerState.STOPPED;
-  searchTerm: string = '';
   private readonly playerStateSubscription: Subscription;
   private readonly destroy$ = new Subject<void>();
   protected readonly imageLoadError = new BehaviorSubject<{ [key: string]: boolean }>({});
@@ -112,7 +115,6 @@ export class LibraryListComponent implements OnInit, OnDestroy {
       return this.defaultCoverImage;
     }
 
-
     if (this.isBlobUrl(track.imageUrl)) {
       console.log(`Using blob URL for track ${track.id}:`, track.imageUrl);
       return track.imageUrl;
@@ -124,7 +126,6 @@ export class LibraryListComponent implements OnInit, OnDestroy {
     }
     return track.imageUrl;
   }
-
 
   private isBlobUrl(url: string | undefined): boolean {
     return <boolean>url?.startsWith('blob:');

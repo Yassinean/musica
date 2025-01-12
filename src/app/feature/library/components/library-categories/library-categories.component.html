@@ -1,9 +1,22 @@
-<ul class="divide-y divide-white/10">
-  @for (category of Object.values(musicCategory); track category) {
-    <li class="p-4 hover:bg-white/5 transition-colors duration-200">
-      <a routerLink="" class="flex items-center space-x-3 text-sm">
-        <span class="capitalize">{{ category.toLowerCase() }}</span>
-      </a>
+<div class="bg-gradient-to-r from-purple-900 to-indigo-900 p-6 rounded-lg shadow-lg">
+  <ul class="space-y-2">
+    <li>
+      <button
+        (click)="filterByCategory(null)"
+        [class.bg-purple-600]="(selectedCategory$ | async) === null"
+        class="w-full text-left px-4 py-2 rounded-md text-white hover:bg-purple-700 transition-colors duration-200"
+      >
+        All Categories
+      </button>
     </li>
-  }
-</ul>
+    <li *ngFor="let category of musicCategory | keyvalue">
+      <button
+        (click)="filterByCategory(category.value)"
+        [class.bg-purple-600]="isSelectedCategory(category.value)"
+        class="w-full text-left px-4 py-2 rounded-md text-white hover:bg-purple-700 transition-colors duration-200"
+      >
+        {{ category.value | titlecase }}
+      </button>
+    </li>
+  </ul>
+</div>

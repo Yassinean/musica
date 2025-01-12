@@ -2,7 +2,7 @@
   <ng-container *ngIf="(isLoading$ | async) === false; else loading">
     <ng-container *ngIf="(trackError$ | async) === null; else error">
       <ul class="divide-y divide-white/10" *ngIf="(tracks$ | async) as tracks">
-        <li *ngFor="let track of tracks" class="p-4 hover:bg-white/5 transition-colors duration-200">
+        <li *ngFor="let track of tracks | searchTrack:searchTerm" class="p-4 hover:bg-white/5 transition-colors duration-200">
           <div class="flex items-center space-x-4">
             <img
               [src]="getTrackImage(track)"
@@ -48,7 +48,10 @@
         </li>
       </ul>
 
-      <p *ngIf="(tracks$ | async)?.length === 0" class="text-center py-8 text-gray-400">No tracks found in your library.</p>
+      <p *ngIf="(tracks$ | async)?.length === 0 || ((tracks$ | async) | searchTrack:searchTerm)?.length === 0" 
+         class="text-center py-8 text-gray-400">
+        {{ (tracks$ | async)?.length === 0 ? 'No tracks found in your library.' : 'No tracks match your search.' }}
+      </p>
     </ng-container>
   </ng-container>
 </div>

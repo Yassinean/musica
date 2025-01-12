@@ -20,11 +20,11 @@ export enum MusicCategory{
 }
 
 export enum PlayerState {
-  PLAYING = 'playing',
-  PAUSED = 'paused',
-  BUFFERING = 'buffering',
-  STOPPED = 'stopped',
-  LOADING = 'loading',
-  ERROR = 'error',
-  SUCCESS = 'success'
+  PLAYING = 'PLAYING',
+  PAUSED = 'PAUSED',
+  BUFFERING = 'BUFFERING',
+  STOPPED = 'STOPPED',
+  LOADING = 'LOADING',
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS'
 }
