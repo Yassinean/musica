@@ -32,3 +32,8 @@ export const selectImageLoadErrors = createSelector(
   selectTrackState,
   (state: TrackState) => state.imageLoadErrors
 );
+
+export const selectFavoriteTracks = createSelector(
+  selectAllTracks,
+  (tracks) => tracks.filter(track => track.isFavorite)
+);

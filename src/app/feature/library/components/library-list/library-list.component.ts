@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { AsyncPipe, DatePipe, NgForOf, NgIf } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { PlayerState, Track } from "../../../../core/models/track.model";
-import { BehaviorSubject, Observable, Subject, Subscription, takeUntil } from "rxjs";
+import {async, BehaviorSubject, Observable, Subject, Subscription, takeUntil} from "rxjs";
 import { Store } from "@ngrx/store";
 import { Router } from "@angular/router";
 import { AudioService } from "../../../../core/service/audio.service";
@@ -29,7 +29,6 @@ export class LibraryListComponent implements OnInit, OnDestroy {
   @Input() tracks: Track[] | null = null;
   @Input() searchTerm: string = '';
 
-  tracks$: Observable<Track[]>;
   trackError$: Observable<string | null>;
   isLoading$: Observable<boolean>;
   openDropdownId: string | null = null;
@@ -48,7 +47,6 @@ export class LibraryListComponent implements OnInit, OnDestroy {
     private readonly audioPlayer: AudioService,
     private readonly trackService: TrackService,
   ) {
-    this.tracks$ = this.store.select(selectFilteredTracks);
     this.trackError$ = this.store.select(selectTrackError);
     this.isLoading$ = this.store.select(selectTrackLoading);
     this.playerStateSubscription = this.audioPlayer.playerState$.pipe(takeUntil(this.destroy$))
@@ -59,29 +57,30 @@ export class LibraryListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.preloadDefaultImage();
-    this.loadTracks();
-    this.tracks$.subscribe((tracks) => {
-      tracks.forEach((track) => {
+    this.loadImages();
+  }
+
+  private loadImages(): void {
+    if (this.tracks) {
+      this.tracks.forEach(track => {
         if (track.imageFileId) {
           this.trackService.getImageFileUrl(track.imageFileId).subscribe({
             next: (url) => {
               if (typeof url === "string") {
-                this.imageUrls[track.id!] = url;
+                this.imageUrls[track.id] = url;
               } else {
-                this.imageUrls[track.id!] = this.defaultCoverImage;
+                this.imageUrls[track.id] = this.defaultCoverImage;
               }
-              console.log('Image URL fetched for track:', track.title, url);
             },
-            error: (err) => {
-              console.error('Error fetching image file URL:', err);
-              this.imageUrls[track.id!] = this.defaultCoverImage;
+            error: () => {
+              this.imageUrls[track.id] = this.defaultCoverImage;
             },
           });
         } else {
-          this.imageUrls[track.id!] = this.defaultCoverImage;
+          this.imageUrls[track.id] = this.defaultCoverImage;
         }
       });
-    });
+    }
   }
 
   ngOnDestroy(): void {
@@ -95,14 +94,6 @@ export class LibraryListComponent implements OnInit, OnDestroy {
   private preloadDefaultImage(): void {
     const img = new Image();
     img.src = this.defaultCoverImage;
-  }
-
-  private loadTracks(): void {
-    this.tracks$.pipe(takeUntil(this.destroy$)).subscribe((tracks) => {
-      if (!tracks || tracks.length === 0) {
-        this.store.dispatch(TrackActions.loadTracks());
-      }
-    });
   }
 
   handleImageError(trackId: string, event: Event): void {
@@ -196,4 +187,11 @@ export class LibraryListComponent implements OnInit, OnDestroy {
   isCurrentTrack(track: Track): boolean {
     return this.currentTrack?.id === track.id;
   }
+
+  toggleFavorite(track: Track, event: Event): void {
+    event.stopPropagation();
+    this.store.dispatch(TrackActions.toggleFavorite({ trackId: track.id }));
+  }
+
+  protected readonly async = async;
 }

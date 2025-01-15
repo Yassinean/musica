@@ -1,0 +1,81 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
+    <div class="absolute top-1/2 right-0 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float animation-delay-2000"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-pink-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-float animation-delay-4000"></div>
+  </div>
+
+  <div class="max-w-4xl mx-auto relative">
+    <h1 class="text-4xl font-bold text-center mb-8">
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+        Favorite Tracks
+      </span>
+    </h1>
+
+    <!-- Show Loading Spinner While Data is Being Loaded -->
+    <ng-container *ngIf="loading$ | async; else content">
+      <div class="text-center py-12 bg-white/10 backdrop-blur-lg rounded-xl p-8 shadow-xl">
+        <svg
+          class="w-16 h-16 mx-auto text-purple-400 animate-spin"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-width="2"
+            d="M11.083 5.104c.35-.8 1.485-.8 1.834 0l1.752 4.022a1 1 0 0 0 .84.597l4.463.342c.9.069 1.255 1.2.556 1.771l-3.33 2.723a1 1 0 0 0-.337 1.016l1.03 4.119c.214.858-.71 1.552-1.474 1.106l-3.913-2.281a1 1 0 0 0-1.008 0L7.583 20.8c-.764.446-1.688-.248-1.474-1.106l1.03-4.119A1 1 0 0 0 6.8 14.56l-3.33-2.723c-.698-.571-.342-1.702.557-1.771l4.462-.342a1 1 0 0 0 .84-.597l1.753-4.022Z"
+          />
+        </svg>
+        <p class="text-xl text-purple-300 mt-4">Loading favorites...</p>
+      </div>
+    </ng-container>
+
+    <ng-template #content>
+      <ng-container *ngIf="favoriteTracks$ | async as favorites">
+        <div *ngIf="favorites.length > 0; else noFavorites" class="bg-white/10 backdrop-blur-lg rounded-xl p-8 shadow-xl">
+          <app-library-list [tracks]="favorites"></app-library-list>
+        </div>
+      </ng-container>
+
+      <!-- No Favorites Available -->
+      <ng-template #noFavorites>
+        <div class="text-center py-12 bg-white/10 backdrop-blur-lg rounded-xl p-8 shadow-xl">
+          <svg
+            class="w-16 h-16 mx-auto text-purple-400 mb-4"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              stroke-width="2"
+              d="M11.083 5.104c.35-.8 1.485-.8 1.834 0l1.752 4.022a1 1 0 0 0 .84.597l4.463.342c.9.069 1.255 1.2.556 1.771l-3.33 2.723a1 1 0 0 0-.337 1.016l1.03 4.119c.214.858-.71 1.552-1.474 1.106l-3.913-2.281a1 1 0 0 0-1.008 0L7.583 20.8c-.764.446-1.688-.248-1.474-1.106l1.03-4.119A1 1 0 0 0 6.8 14.56l-3.33-2.723c-.698-.571-.342-1.702.557-1.771l4.462-.342a1 1 0 0 0 .84-.597l1.753-4.022Z"
+            />
+          </svg>
+          <p class="text-xl text-purple-300 mb-2">No favorite tracks yet</p>
+          <p class="text-gray-400">
+            Start adding favorites by clicking the star icon on any track
+          </p>
+        </div>
+      </ng-template>
+
+      <!-- Error State -->
+      <ng-container *ngIf="error$ | async as error">
+        <div class="text-center bg-red-500/10 backdrop-blur-lg rounded-xl p-8 shadow-xl">
+          <p class="text-red-400 mb-4">An error occurred: {{ error }}</p>
+          <button
+            (click)="loadFavorites()"
+            class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+          >
+            Try Again
+          </button>
+        </div>
+      </ng-container>
+    </ng-template>
+  </div>
+</div>
+

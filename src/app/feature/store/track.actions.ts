@@ -24,10 +24,10 @@ export const addTrackFailure=createAction('[Track] Add Track Failure', props<{ e
 //update Track
 export const updateTrack = createAction(
   '[Track] Update Track',
-  props<{ 
-    updatedTrack: Track, 
+  props<{
+    updatedTrack: Track,
     audioFile: Blob | null,
-    imageFile: File | null 
+    imageFile: File | null
   }>()
 );
 export const updateTrackSuccess=createAction('[Track] Update Track Success', props<{ track: Track }>());
@@ -64,4 +64,17 @@ export const loadTrackImageFailure = createAction(
 export const imageLoadError = createAction(
   '[Track] Image Load Error',
   props<{ trackId: string }>()
+);
+
+export const toggleFavorite = createAction(
+  '[Track] Toggle Favorite',
+  props<{ trackId: string }>()
+);
+export const toggleFavoriteSuccess = createAction(
+  '[Track] Toggle Favorite Success',
+  props<{ track: Track }>()
+);
+export const toggleFavoriteFailure = createAction(
+  '[Track] Toggle Favorite Failure',
+  props<{ error: string }>()
 );

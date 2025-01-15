@@ -20,7 +20,8 @@ import { CommonModule } from '@angular/common';
 
 export class NavbarComponent {
   navLinks = [
+    { path: '/favorites', label: 'Favoris'  },
     { path: '/library', label: 'Library' },
-    { path: '/tracks', label: 'Add tracks'  }
+    { path: '/tracks', label: 'Add tracks'  },
   ];
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {DBSchema, IDBPDatabase, openDB} from "idb";
 import {Track} from "../models/track.model";
-import {Observable, throwError, from, map, catchError, of} from "rxjs";
+import {Observable, throwError, from, map, catchError, of, mergeMap} from "rxjs";
 
 
 interface AudioFile{
@@ -263,6 +263,29 @@ export class TrackService {
     }
     return from(this.db.getAll('coverImage')).pipe(
       map(records => records.map(record => record.file))
+    );
+  }
+
+  toggleFavorite(trackId: string): Observable<Track> {
+    if (!this.db) {
+      return throwError(() => new Error('Database not initialized'));
+    }
+
+    return from(this.db!.get('tracks', trackId)).pipe(
+      mergeMap(track => {
+        if (!track) {
+          return throwError(() => new Error('Track not found'));
+        }
+
+        const updatedTrack: Track = {
+          ...track,
+          isFavorite: track.isFavorite === true ? false : true
+        };
+
+        return from(this.db!.put('tracks', updatedTrack)).pipe(
+          map(() => updatedTrack)
+        );
+      })
     );
   }
 }

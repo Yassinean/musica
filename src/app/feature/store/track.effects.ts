@@ -57,7 +57,7 @@ export class TrackEffects {
         // Convert File to Blob if needed
         const audioBlob = audioFile instanceof File ? audioFile : audioFile;
         const imageBlob = imageFile instanceof File ? imageFile : imageFile;
-        
+
         return this.trackService.updateTrack(updatedTrack, audioBlob, imageBlob).pipe(
           map((track) => TrackActions.updateTrackSuccess({ track })),
           catchError((error) => of(TrackActions.updateTrackFailure({ error })))
@@ -74,6 +74,18 @@ export class TrackEffects {
         this.trackService.deleteTrack(id).pipe(
           map(() => TrackActions.deleteTrackSuccess({ id })),
           catchError((error) => of(TrackActions.deleteTrackFailure({ error })))
+        )
+      )
+    )
+  );
+
+  toggleFavorite$ = createEffect(() =>
+    this.action$.pipe(
+      ofType(TrackActions.toggleFavorite),
+      mergeMap(({ trackId }) =>
+        this.trackService.toggleFavorite(trackId).pipe(
+          map((track) => TrackActions.toggleFavoriteSuccess({ track })),
+          catchError((error) => of(TrackActions.toggleFavoriteFailure({ error: error.message || 'Error toggling favorite' })))
         )
       )
     )

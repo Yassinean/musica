@@ -1,5 +1,5 @@
-
 import { Routes } from '@angular/router';
+import { FavoritesPageComponent } from './feature/favorites/favorites-page.component';
 
 export const routes: Routes = [
   {
@@ -21,6 +21,11 @@ export const routes: Routes = [
     path: 'track/edit/:id',
     loadComponent: () =>
       import('./feature/track/pages/update-track/update-track.component').then(m => m.UpdateTrackComponent),
+  },
+  {
+    path: 'favorites',
+    component: FavoritesPageComponent,
+    title: 'Favorites'
   },
   {
     path: '',

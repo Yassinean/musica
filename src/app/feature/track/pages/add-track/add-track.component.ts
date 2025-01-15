@@ -47,7 +47,7 @@ export class AddTrackComponent {
 
 
   validateAudioFile(file: Blob): boolean {
-    const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/ogg'];
+    const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/ogg' , 'audio/m4a'];
 
     if (file.size > this.maxAudioSize * 1024 * 1024) {
       this.audioFileError = `Audio file size must be less than ${this.maxAudioSize}MB`;
@@ -152,7 +152,8 @@ export class AddTrackComponent {
         category,
         fileUrl: URL.createObjectURL(audioFile),
         imageUrl: imageFile ? URL.createObjectURL(imageFile) : undefined,
-        imageFileId: idT
+        imageFileId: idT,
+        isFavorite: false
       };
 
       console.log('Track:', track);

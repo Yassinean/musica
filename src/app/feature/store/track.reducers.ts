@@ -3,7 +3,7 @@ import {createReducer, on} from "@ngrx/store";
 import * as TrackActions from './track.actions';
 
 export interface TrackState {
-  imageLoadErrors: any;
+  imageLoadErrors: { [key: string]: boolean };
   tracks: Track[];
   selectedTrack: Track | null;
   loading: boolean;
@@ -13,7 +13,7 @@ export interface TrackState {
 
 const initialState: TrackState = {
   tracks: [],
-  imageLoadErrors: null,
+  imageLoadErrors: {},
   selectedTrack: null,
   loading: false,
   error: null,
@@ -74,5 +74,15 @@ export const trackReducer = createReducer(
       ...state.imageLoadErrors,
       [trackId]: true
     }
+  })),
+  on(TrackActions.toggleFavoriteSuccess, (state, { track }) => ({
+    ...state,
+    tracks: state.tracks.map(t =>
+      t.id === track.id ? { ...t, isFavorite: track.isFavorite } : t
+    ),
+  })),
+  on(TrackActions.toggleFavoriteFailure, (state, { error }) => ({
+    ...state,
+    error: error || 'An error occurred while toggling the favorite status'
   }))
 )

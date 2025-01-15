@@ -1,29 +1,23 @@
-# Step 1: Use Node.js to build the Angular app
-FROM node:20 as build
+# Use Node.js as the base image
+FROM node:alpine
 
-# Set the working directory
+# Copy package.json and package-lock.json files
+COPY package.json ./
+
 WORKDIR /app
+COPY . /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Install Cli Angular
+RUN npm install -g @angular/cli@17
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the app files
-COPY . .
+# Copy the rest of the application files
 
-# Build the Angular app
-RUN npm run build --prod
 
-# Step 2: Use Nginx to serve the Angular app
-FROM nginx:stable-alpine
+# Expose the Angular development server port (default is 4200)
+EXPOSE 4200
 
-# Copy the built files from the build stage
-COPY --from=build /app/dist/musica /usr/share/nginx/html
-
-# Expose port 80
-EXPOSE 80
-
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Command to start the Angular app
+CMD ["ng", "serve", "--host", "0.0.0.0"]
