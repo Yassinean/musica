@@ -118,7 +118,8 @@ export class UpdateTrackComponent implements OnInit, OnDestroy {
     return true;
   }
   onImageChange(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (file) {
       if (this.validateUpdateImageFile(file)) {
         this.selectedImageFile = file;
@@ -130,6 +131,7 @@ export class UpdateTrackComponent implements OnInit, OnDestroy {
       } else {
         this.selectedImageFile = null;
         this.imagePreview = this.currentImageUrl;
+        input.value = ''; // Clear the input field
       }
     }
   }
@@ -146,6 +148,10 @@ export class UpdateTrackComponent implements OnInit, OnDestroy {
         this.selectedAudioFile = file;
         this.updateForm.patchValue({ audioFile: this.selectedAudioFile.name });
         this.audioFileError = null;
+      } else {
+        this.selectedAudioFile = null;
+        this.updateForm.patchValue({ audioFile: null });
+        input.value = ''; // Clear the input field
       }
     }
   }

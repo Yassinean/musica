@@ -80,20 +80,21 @@ export class AddTrackComponent {
   }
 
   onImageChange(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
 
     if (file) {
       if (this.validateImageFile(file)) {
         this.trackForm.patchValue({ imageFile: file });
-
         const reader = new FileReader();
         reader.onload = () => {
-          this.imagePreview = reader.result as string; // This will be a base64 string
+          this.imagePreview = reader.result as string;
         };
-        reader.readAsDataURL(file); // Read the file as a data URL
+        reader.readAsDataURL(file);
       } else {
         this.trackForm.patchValue({ imageFile: null });
         this.imagePreview = null;
+        input.value = '';
       }
     }
   }
@@ -175,8 +176,11 @@ export class AddTrackComponent {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       if (this.validateAudioFile(file)) {
-        this.trackForm.patchValue({ audioFile: file }); // Store the actual file
+        this.trackForm.patchValue({ audioFile: file });
         this.audioFileError = null;
+      } else {
+        this.trackForm.patchValue({ audioFile: null });
+        input.value = '';
       }
     }
   }
