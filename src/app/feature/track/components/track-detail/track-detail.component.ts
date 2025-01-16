@@ -196,4 +196,9 @@ export class TrackDetailComponent {
       }
     });
   }
+
+  toggleFavorite(track: Track, event: Event): void {
+    event.stopPropagation();
+    this.store.dispatch(TrackActions.toggleFavorite({ trackId: track.id }));
+  }
 }
